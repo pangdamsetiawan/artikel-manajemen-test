@@ -44,15 +44,17 @@ export default function LoginPage() {
     try {
       const response = await apiClient.post('/auth/login', data);
       
-      const token = response.data.token; 
+      const token = response.data.token;
+      const role = response.data.role;
       
-      if (token) {
+      if (token && role) {
         localStorage.setItem('authToken', token);
+        localStorage.setItem('userRole', role);
         toast.success("Login berhasil!");
         
-        router.push('/articles'); 
+        router.push('/articles');
       } else {
-        toast.error("Login berhasil, tetapi token tidak diterima dari server.");
+        toast.error("Login berhasil, tetapi data penting (token/role) tidak diterima.");
       }
 
     } catch (error) {
