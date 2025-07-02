@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Proyek Tes: Aplikasi Manajemen Artikel
 
-## Getting Started
+Ini adalah proyek yang dibuat sebagai bagian dari tes untuk posisi Frontend Web Developer. Aplikasi ini adalah sistem manajemen artikel yang mendukung dua peran pengguna: **User** dan **Admin**, dengan fitur dan hak akses yang berbeda untuk masing-masing peran.
 
-First, run the development server:
+## Live Demo
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Aplikasi ini sudah di-deploy dan dapat diakses secara langsung melalui URL berikut:
+**[LINK DEPLOYMENT ANDA DI SINI, CONTOH: https://nama-proyek.vercel.app]**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Fitur Utama
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### ✅ Fitur untuk Peran User
+-   **Otentikasi**: Login, Register, dan Logout dengan validasi form.
+-   **Daftar Artikel**:
+    -   Pencarian artikel dengan *debounce* untuk performa optimal.
+    -   Filter artikel berdasarkan kategori.
+    -   Paginasi jika jumlah artikel lebih dari 9.
+-   **Detail Artikel**:
+    -   Menampilkan konten lengkap artikel.
+    -   Menampilkan 3 artikel terkait dari kategori yang sama.
 
-## Learn More
+### ✅ Fitur untuk Peran Admin
+-   **Otorisasi**: Halaman dashboard dan manajemen yang hanya bisa diakses oleh Admin.
+-   **Manajemen Kategori**:
+    -   Menampilkan, mencari, dan paginasi daftar kategori.
+    -   Menambah dan mengedit kategori melalui dialog/pop-up.
+-   **Manajemen Artikel**:
+    -   Menampilkan, mencari, dan memfilter daftar semua artikel.
+    -   Menambah dan mengedit artikel menggunakan form dengan validasi.
+    -   Rich Text Editor (Tiptap) untuk pembuatan konten.
+    -   Fitur "Preview" sebelum artikel disimpan.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Teknologi yang Digunakan
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+-   **Framework**: Next.js 14+ (App Router)
+-   **Styling**: Tailwind CSS
+-   **UI Komponen**: Shadcn/UI
+-   **Manajemen Form & Validasi**: React Hook Form & Zod
+-   **Fetching API**: Axios
+-   **Editor Teks**: Tiptap
+-   **Ikon**: Lucide React
+-   **Version Control**: Git & GitHub (Git Flow)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Cara Menjalankan Proyek Secara Lokal
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Untuk menjalankan proyek ini di lingkungan lokal Anda, ikuti langkah-langkah berikut:
+
+1.  **Clone repository ini:**
+    ```bash
+    git clone https://github.com/pangdamsetiawan/artikel-manajemen-test
+    ```
+
+2.  **Masuk ke direktori proyek:**
+    ```bash
+    cd nama-folder-proyek
+    ```
+
+3.  **Install semua dependensi:**
+    ```bash
+    npm install
+    ```
+
+4.  **Jalankan server pengembangan:**
+    ```bash
+    npm run dev
+    ```
+
+5.  Buka **[http://localhost:3000](http://localhost:3000)** di browser Anda.
+
+---
+
+## Kontak
+
+Dibuat oleh - **Pangdam R. Setiawan**
