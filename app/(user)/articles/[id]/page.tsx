@@ -6,24 +6,25 @@ import { toast } from 'sonner';
 import apiClient from '@/lib/axios';
 import Link from 'next/link';
 import Image from 'next/image';
-import React from 'react';
 import { AxiosError } from 'axios';
-import { Button } from '@/components/ui/button'; // Impor komponen Button
-import { ArrowLeft } from 'lucide-react'; // Impor ikon
+import { Button } from '@/components/ui/button';
+import { ArrowLeft } from 'lucide-react';
 
-// Definisikan tipe untuk objek artikel
 interface Article {
   id: string | number;
   title: string;
   content: string;
   imageUrl?: string;
-  category_id?: number;
-  Category?: {
+  categoryId?: string;
+  category?: {
+    id: string;
     name: string;
+  };
+  user?: {
+    username: string;
   };
 }
 
-// Komponen kartu artikel lainnya
 interface ArticleCardProps {
   article: Article;
 }
@@ -72,7 +73,7 @@ export default function ArticleDetailPage() {
       try {
         const [mainArticleRes, allArticlesRes] = await Promise.all([
           apiClient.get(`/articles/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
-          apiClient.get('/articles', { headers: { Authorization: `Bearer ${token}` } })
+          apiClient.get('/articles', { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         const mainArticle: Article = mainArticleRes.data;
@@ -80,16 +81,21 @@ export default function ArticleDetailPage() {
 
         setArticle(mainArticle);
 
-        if (mainArticle && mainArticle.category_id) {
+        if (mainArticle?.category?.id) {
           const relatedArticles = allArticles
-            .filter(a => a.category_id === mainArticle.category_id && a.id != mainArticle.id)
+            .filter(
+              (a) =>
+                a.category?.id === mainArticle.category?.id && a.id !== mainArticle.id
+            )
             .slice(0, 3);
           setOtherArticles(relatedArticles);
         }
       } catch (err: unknown) {
-        let message = "Gagal mengambil data artikel.";
+        let message = 'Gagal mengambil data artikel.';
         if (err instanceof AxiosError) {
-          message = err.response?.data?.message || "Artikel dengan ID ini tidak ditemukan.";
+          message =
+            err.response?.data?.message ||
+            'Artikel dengan ID ini tidak ditemukan.';
         }
         toast.error(message);
       } finally {
@@ -123,7 +129,6 @@ export default function ArticleDetailPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        {/* ## Tombol "Kembali" yang Sudah Diperbaiki ## */}
         <Button asChild variant="ghost" className="mb-8 px-0 text-blue-600 hover:text-blue-700">
           <Link href="/articles">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -133,7 +138,10 @@ export default function ArticleDetailPage() {
         <article>
           <h1 className="text-3xl md:text-5xl font-extrabold mb-4">{article.title}</h1>
           <p className="text-gray-500 mb-2">
-            Kategori: <span className="font-semibold">{article.Category?.name || 'Tidak ada kategori'}</span>
+            Kategori:{' '}
+            <span className="font-semibold">
+              {article.category?.name || 'Tidak ada kategori'}
+            </span>
           </p>
           <div className="relative w-full h-64 md:h-96 my-8">
             <Image
@@ -152,9 +160,11 @@ export default function ArticleDetailPage() {
 
       {otherArticles.length > 0 && (
         <aside className="mt-16 max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold mb-6 border-b pb-2">Artikel Lainnya di Kategori yang Sama</h2>
+          <h2 className="text-2xl font-bold mb-6 border-b pb-2">
+            Artikel Lainnya di Kategori yang Sama
+          </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {otherArticles.map(other => (
+            {otherArticles.map((other) => (
               <ArticleCard key={other.id} article={other} />
             ))}
           </div>

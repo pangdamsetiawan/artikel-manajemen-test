@@ -43,18 +43,26 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       const response = await apiClient.post('/auth/login', data);
-      
+
       const token = response.data.token;
-      const role = response.data.role;
-      
+      const username = response.data.username || data.username;
+      const role = response.data.role || "User"; // ✅ Ambil langsung dari backend
+
       if (token && role) {
         localStorage.setItem('authToken', token);
-        localStorage.setItem('userRole', role);
+        localStorage.setItem('username', username);
+        localStorage.setItem('userRole', role); // optional: bisa digunakan di frontend
+
         toast.success("Login berhasil!");
-        
-        router.push('/articles');
+
+        // ✅ Redirect berdasarkan role dari backend
+        if (role === "Admin") {
+          router.push("/dashboard");
+        } else {
+          router.push("/articles");
+        }
       } else {
-        toast.error("Login berhasil, tetapi data penting (token/role) tidak diterima.");
+        toast.error("Login berhasil, tetapi data tidak lengkap.");
       }
 
     } catch (error) {
