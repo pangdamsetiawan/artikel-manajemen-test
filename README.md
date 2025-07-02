@@ -5,7 +5,7 @@ Ini adalah proyek yang dibuat sebagai bagian dari tes untuk posisi Frontend Web 
 ## Live Demo
 
 Aplikasi ini sudah di-deploy dan dapat diakses secara langsung melalui URL berikut:
-**[LINK DEPLOYMENT ANDA DI SINI, CONTOH: https://nama-proyek.vercel.app]**
+**artikel-manajemen-test.vercel.app**
 
 ---
 
