@@ -9,19 +9,11 @@ import Image from 'next/image';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Input } from '@/components/ui/input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
+  Pagination, PaginationContent, PaginationItem,
+  PaginationLink, PaginationNext, PaginationPrevious
 } from "@/components/ui/pagination";
 
 // Komponen Kartu Artikel
@@ -61,33 +53,38 @@ export default function ArticlesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
 
-  useEffect(() => {
+  const fetchData = async () => {
     const token = localStorage.getItem('authToken');
     if (!token) {
       router.push('/login');
       return;
     }
 
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [articlesRes, categoriesRes] = await Promise.all([
-          apiClient.get('/articles', { headers: { Authorization: `Bearer ${token}` } }),
-          apiClient.get('/categories', { headers: { Authorization: `Bearer ${token}` } })
-        ]);
+    try {
+      const [articlesRes, categoriesRes] = await Promise.all([
+        apiClient.get('/articles', { headers: { Authorization: `Bearer ${token}` } }),
+        apiClient.get('/categories', { headers: { Authorization: `Bearer ${token}` } })
+      ]);
 
-        setAllArticles(articlesRes.data.data);
-        setFilteredArticles(articlesRes.data.data);
-        setCategories(categoriesRes.data.data);
-      } catch (error) {
-        toast.error("Gagal mengambil data awal.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+      setAllArticles(articlesRes.data.data);
+      setCategories(categoriesRes.data.data);
+    } catch (error) {
+      toast.error("Gagal mengambil data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
-  }, [router]);
+
+    // Polling setiap 5 detik
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5000);
+
+    return () => clearInterval(interval); // Hentikan polling saat unmount
+  }, []);
 
   useEffect(() => {
     let results = allArticles;
@@ -144,7 +141,6 @@ export default function ArticlesPage() {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="max-w-sm"
         />
-
         <Select
           onValueChange={(value) => setSelectedCategory(value)}
           value={selectedCategory}

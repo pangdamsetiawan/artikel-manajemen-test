@@ -20,6 +20,9 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
+import {
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle
+} from "@/components/ui/dialog";
 
 // Types
 interface Article {
@@ -50,6 +53,10 @@ export default function AdminArticlesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Untuk modal konfirmasi hapus
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | number | null>(null);
+
   useEffect(() => {
     const role = localStorage.getItem("userRole");
     if (role !== "Admin") {
@@ -69,18 +76,13 @@ export default function AdminArticlesPage() {
 
       try {
         const [articlesRes, categoriesRes] = await Promise.all([
-          apiClient.get("/articles", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          apiClient.get("/categories", {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
+          apiClient.get("/articles", { headers: { Authorization: `Bearer ${token}` } }),
+          apiClient.get("/categories", { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         setAllArticles(articlesRes.data.data);
         setFilteredArticles(articlesRes.data.data);
 
-        // FILTER kategori yang memiliki ID kosong
         const validCategories = categoriesRes.data.data.filter(
           (cat: Category) => String(cat.id).trim() !== ""
         );
@@ -121,8 +123,32 @@ export default function AdminArticlesPage() {
   const totalPages = Math.ceil(filteredArticles.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
+  const openDeleteDialog = (id: string | number) => {
+    setSelectedArticleId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedArticleId) return;
+
+    const token = localStorage.getItem("authToken");
+    try {
+      await apiClient.delete(`/articles/${selectedArticleId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Artikel berhasil dihapus.");
+
+      const updated = allArticles.filter((a) => a.id !== selectedArticleId);
+      setAllArticles(updated);
+      setFilteredArticles(updated);
+    } catch {
+      toast.error("Gagal menghapus artikel.");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setSelectedArticleId(null);
     }
   };
 
@@ -132,7 +158,6 @@ export default function AdminArticlesPage() {
 
   return (
     <div className="container mx-auto py-10">
-      {/* Tombol kembali */}
       <Button asChild variant="ghost" className="mb-4">
         <Link href="/dashboard">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -185,9 +210,7 @@ export default function AdminArticlesPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
-                  Memuat...
-                </TableCell>
+                <TableCell colSpan={4} className="h-24 text-center">Memuat...</TableCell>
               </TableRow>
             ) : currentItems.length > 0 ? (
               currentItems.map((article) => (
@@ -196,9 +219,14 @@ export default function AdminArticlesPage() {
                   <TableCell>{article.category?.name || "-"}</TableCell>
                   <TableCell>{article.user?.username || "-"}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="outline" size="sm">
-                      <Link href={`/dashboard/articles/edit/${article.id}`}>Edit</Link>
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/dashboard/articles/edit/${article.id}`}>Edit</Link>
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => openDeleteDialog(article.id)}>
+                        Hapus
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -255,6 +283,22 @@ export default function AdminArticlesPage() {
           </Pagination>
         </div>
       )}
+
+      {/* Modal konfirmasi hapus */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Konfirmasi Hapus</DialogTitle>
+            <DialogDescription>
+              Apakah Anda yakin ingin menghapus artikel ini? Tindakan ini tidak dapat dibatalkan.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Batal</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Hapus</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
